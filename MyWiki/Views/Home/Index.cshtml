@@ -1,0 +1,136 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+<style>
+    #left {
+        width: 300px;
+        border: 1px solid #ccc;
+        float: left;
+        margin-top: 15px;
+    }
+
+    #right {
+        height: 100%;
+        margin-left: 310px;
+        padding: 15px;
+    }
+
+    #title {
+        border-bottom: 1px dashed #ccc;
+        padding-bottom: 10px;
+        margin-top: 0px;
+    }
+
+    #content {
+        line-height: 28px;
+    }
+
+    #search {
+        margin: 5px;
+    }
+
+    #list {
+        padding: 10px;
+    }
+
+        #list li {
+            padding: 0;
+        }
+            #list li a {
+                padding:1px 3px;
+            }
+            #changelog li {
+            }
+</style>
+<script>
+    var G_LIST = [];
+    function change(id, category, title) { 
+        $("#list a").css("background", "#fff");
+        $("#"+id).css("background", "#eee"); 
+        load(category, title);
+    }
+    function load(category, title) {
+        category = decodeURI(category);
+        title = decodeURI(title);
+        $('#edit').attr('href', '/Home/Edit?category=' + category + '&title=' + title);
+        $('#edit').html('Edit');
+        $.getJSON('/Home/Get?category=' + category+'&title=' + title, function (res) {
+            //console.log(res);
+            $('#title').html(title);
+            $('#content').html(res.content);
+            $('#changelog').html("");
+            for (var i = 0; i < res.changeLogs.length; i++) {
+                //console.log(res.changeLogs[i]);
+                $('#changelog').append('<li>' + res.changeLogs[i]+'</li>');
+            }
+
+        });
+
+        window.location.hash = '' + category + '/' + title;
+    }
+
+    function filterDoc(item) {
+        if (item.title.toLowerCase().indexOf($('#keyword').val().toLowerCase()) > -1) {
+            return true;
+        }
+        return false;
+    }
+
+    function initList(res) {
+        $('#list').html('');
+        var keyword = $('#keyword').val();
+
+        for (var i = 0; i < res.length; i++) {
+            var title = res[i].title;
+            if (keyword) {
+                title = title.replace(new RegExp(keyword,'gi'), '<b>' + keyword + '</b>');
+            }
+            $('#list').append('<li><a id="item_'+i+'" href="javascript:change(\'item_'+i+'\',\'' + res[i].category + '\',\'' + res[i].title + '\')">' + title + '</a></li>');
+            //console.log(res[i]);
+        }
+    }
+    $(function () {
+        $('#left').css('height', $(window).height() - 150);
+        
+        $('#keyword').keyup(function () {
+            var searchResult = G_LIST.filter(filterDoc);
+            //console.log(searchResult);
+            initList(searchResult);
+        });
+        $.getJSON('/Home/GetList?category=@Context.Request.Query["category"]', function (res) {
+            G_LIST = res;
+            initList(res);
+        });
+
+        if (window.location.hash != '') {
+            var hash = window.location.hash.split('/');
+            //console.log(hash);
+            if (hash.length == 2) {
+                load(hash[0].substring(1), hash[1]);
+            }
+        }
+    });
+</script>
+<div>
+    <div id="left">
+        <div id="search">
+            <input type="text" id="keyword" name="keyword" value="" />
+            <button id="Search">Search</button>
+        </div>
+
+        <div style="clear:both;"></div>
+        <ul id="list"></ul>
+    </div>
+    <div id="right">
+        <div><h1 id="title"></h1></div>
+        <div id="content"></div>
+        <div id="operation" style="border-top:1px dashed #ccc;margin-top:10px;padding-top:10px;">
+            <a id="edit" href="/Home/Edit?category=@Context.Request.Query["category"]">New</a>
+        </div>
+        <div style="border-top:1px dashed #ccc;margin-top:10px;padding:10px 0;">
+            <h4>Change logs</h4>
+            <ul id="changelog"></ul>
+        </div>
+    </div>
+    <div style="clear:both;"></div>
+</div>

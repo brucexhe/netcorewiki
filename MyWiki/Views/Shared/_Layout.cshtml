@@ -1,0 +1,125 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - MyWiki</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script type="text/javascript" charset="utf-8" src="~/ueditor/ueditor.config.js"></script>
+    <script type="text/javascript" charset="utf-8" src="~/ueditor/ueditor.all.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="~/ueditor/lang/zh-cn/zh-cn.js"></script>
+    <style>
+        html{
+            font-size:18px;
+        }
+        pre{
+            font-size:14px;
+        }
+
+        ol.linenums {
+            list-style: decimal;
+            background-color: #fff;
+            margin: 0px 0px 1px 45px !important;
+            padding: 0px;
+            color: #5C5C5C;
+        }
+
+        ol.linenums {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
+        ol.linenums li:nth-child(odd),li.L0, li.L2, li.L4, li.L6, li.L8 {
+            background: #eee;
+        }
+        ol.linenums li:nth-child(even),li.L1, li.L3, li.L5, li.L7, li.L9 {
+            background: #F8F8F8;
+        }
+        ol.linenums,li.L0, li.L1, li.L2, li.L3, li.L4, li.L5, li.L6, li.L7, li.L8, li.L9 {
+            padding: 0 5px;
+            list-style: decimal-leading-zero;
+            list-style-position: outside !important;
+            border-left: 3px solid #6CE26C;
+        }
+
+
+        #content table {
+            display: block;
+            width: 100%;
+            overflow: auto;
+            word-break: normal;
+            word-break: keep-all
+        }
+
+        #content table th {
+            font-weight: 700
+        }
+
+            #content table td, .markdown-body table th {
+                padding: 6px 13px;
+                border: 1px solid #ddd
+            }
+
+        #content table tr {
+            background-color: #fff;
+            border-top: 1px solid #ccc
+        }
+
+        #content table tr:nth-child(2n) {
+            background-color: #f8f8f8
+        }
+
+        #content img {
+            max-width: 100%;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box
+        }
+
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">MyWiki</a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    @if (ViewBag.CategoryList != null)
+        {
+            foreach (var item in ViewBag.CategoryList)
+            {
+                <li><a href="/?category=@item" @Html.Raw(((Context.Request.Query["category"].ToString() == item) ? "class=\"active\"" : ""))>@item</a></li>
+}
+}
+
+                </ul>
+                <span style="float:right;line-height:45px;margin-right:10px;color:#efefef;">
+                    @{ 
+                        var username =  System.Net.Dns.GetHostEntry(Context.Request.HttpContext.Connection.RemoteIpAddress).HostName;
+                        username = username.Split(".phbdomain")[0].Split("-").Last();
+                    }
+                    Hi, <a href="javascript:">@username</a>
+                </span>
+            </div>
+        </div>
+    </nav>
+    <div class=" body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; 2018 - MyWiki</p>
+        </footer>
+    </div>
+</body>
+</html>
